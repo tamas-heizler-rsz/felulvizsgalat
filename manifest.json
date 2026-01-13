@@ -1,7 +1,7 @@
 {
-  "name": "PWA PDF App",
-  "short_name": "PWAApp",
-  "start_url": "./index.html",
+  "name": "PDF generáló",
+  "short_name": "PDFApp",
+  "start_url": "index.html",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#1976d2",
