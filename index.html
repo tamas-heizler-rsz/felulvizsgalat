@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PWA Demo</title>
+
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#1976d2">
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    input, select, button {
+      width: 100%;
+      padding: 8px;
+      margin: 6px 0;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>PWA űrlap demo</h1>
+
+  <input id="name" placeholder="Név">
+  <select id="type">
+    <option value="A">A típus</option>
+    <option value="B">B típus</option>
+  </select>
+
+  <button onclick="saveData()">Mentés (offline)</button>
+
+  <p id="status"></p>
+
+  <script src="app.js"></script>
+</body>
+</html>
