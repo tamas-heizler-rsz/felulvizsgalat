@@ -9,6 +9,8 @@
   <link rel="manifest" href="manifest.json">
 
   <style>
+    *, *::before, *::after { box-sizing: border-box; }
+
     body {
       margin: 0;
       padding: 24px;
@@ -17,187 +19,316 @@
       color: #fff;
     }
 
-    h1 {
+    h1, h2 {
       text-align: center;
-      margin-bottom: 24px;
-      font-size: 1.4rem;
+      margin-bottom: 16px;
     }
 
-    form {
+    section {
       max-width: 420px;
       margin: 0 auto;
-      background: #ffffff;
+    }
+
+    .card {
+      background: #fff;
       color: #000;
       padding: 20px;
       border-radius: 16px;
       box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+      margin-bottom: 24px;
     }
 
     label {
       display: block;
-      margin-bottom: 16px;
+      margin-bottom: 14px;
       font-size: 0.9rem;
       font-weight: 600;
     }
 
-    input {
+    input, select {
       width: 100%;
       padding: 12px;
       margin-top: 6px;
       font-size: 1rem;
       border-radius: 10px;
       border: 1px solid #ccc;
-      background: #fff;
-      color: #000;
-	box-sizing: border-box;
     }
 
-    input:focus {
+    input:focus, select:focus {
       outline: 2px solid #FDC024;
       border-color: #FDC024;
     }
 
     .primary-button {
-      background-color: #FDC024;
+      background: #FDC024;
       color: #000;
       border: none;
       border-radius: 14px;
-      padding: 18px 28px;
+      padding: 18px;
       font-size: 1.1rem;
       font-weight: 700;
       text-transform: uppercase;
       cursor: pointer;
       width: 100%;
-      margin-top: 24px;
     }
 
-    .primary-button:active {
-      transform: scale(0.97);
-    }
     .secondary-button {
-  background-color: #FDC024;
-  color: #000;
-  border: none;
-  border-radius: 10px;
-  padding: 10px 16px;
-  font-size: 0.85rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  cursor: pointer;
-}    
+      background: #FDC024;
+      color: #000;
+      border: none;
+      border-radius: 10px;
+      padding: 10px 16px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      cursor: pointer;
+      margin-top: 12px;
+    }
+
+    .issue {
+      background: #f5f5f5;
+      color: #000;
+      padding: 12px;
+      border-radius: 10px;
+      margin-top: 10px;
+      font-size: 0.9rem;
+    }
+
+.issue.zold {
+  background: #d4edda;
+  border-left: 6px solid #28a745;
+}
+
+.issue.sarga {
+  background: #fff3cd;
+  border-left: 6px solid #ffc107;
+}
+
+.issue.piros {
+  background: #f8d7da;
+  border-left: 6px solid #dc3545;
+}
 
   </style>
 </head>
 
 <body>
 
-  <h1>Felülvizsgálati adatok</h1>
+<h1>Felülvizsgálat</h1>
 
-<div id="osszegzes" style="display:none; margin-bottom:16px;">
-  <strong id="osszegzesSzoveg"></strong>
-</div>
-
-<button
-  id="ujSorBtn"
-  class="secondary-button"
-  style="display:none; margin-bottom:24px;"
-  type="button"
->
-  Új sor
-</button>
-
-  <form id="adatForm">
-
-    <label>
-      Ügyfél neve
-      <input type="text" name="ugyfelNev" placeholder="Cégnév Kft." required>
+<!-- PROJEKT -->
+<section id="step-project">
+  <div class="card">
+    <label>Ügyfél neve
+      <input id="ugyfelNev" placeholder="pl. Cégnév Kft.">
     </label>
 
-    <label>
-      Helyszín
-      <input type="text" name="helyszin" placeholder="Város, utca, házszám" required>
+    <label>Helyszín
+      <input id="helyszin" placeholder="pl. Budapest, Raktár utca 1.">
     </label>
 
-    <label>
-      Vizsgáló
-      <input type="text" name="vizsgalo" required>
+    <label>Vizsgáló
+      <input id="vizsgalo" placeholder="pl. Heizler Tamás">
     </label>
 
-    <label>
-      Dátum
-      <input type="date" name="datum" id="datum">
+    <label>Dátum
+      <input type="date" id="datum">
     </label>
 
-    <label>
-      Kapcsolattartó
-      <input type="text" name="kapcsolattarto">
+    <label>Kapcsolattartó
+      <input id="kapcsolattarto" placeholder="pl. Gipsz Jakab">
     </label>
 
-    <button type="submit" class="primary-button">
-      Tovább
+    <button class="primary-button" id="toIssues">
+      TOVÁBB
     </button>
+  </div>
+</section>
 
-  </form>
+<!-- HIBALISTA -->
+<section id="step-issues" style="display:none">
 
-  <script>
-  document.getElementById('datum').value =
-    new Date().toISOString().split('T')[0];
+  <h2 id="projectSummary"></h2>
 
-  const form = document.getElementById('adatForm');
-  const osszegzes = document.getElementById('osszegzes');
-  const osszegzesSzoveg = document.getElementById('osszegzesSzoveg');
-  const ujSorBtn = document.getElementById('ujSorBtn');
+  <div class="card">
+    <label>Tárhelyazonosító
+      <input id="hibaTA" placeholder="pl. A-0101">
+    </label>
 
-  form.addEventListener('submit', e => {
-    e.preventDefault();
-    form.style.display = 'none';
+    <label>Sor
+      <input id="hibaSor" placeholder="pl. 1. sor">
+    </label>
 
-    const data = {
-      ugyfelNev: form.ugyfelNev.value,
-      helyszin: form.helyszin.value,
-      vizsgalo: form.vizsgalo.value,
-      datum: form.datum.value,
-      kapcsolattarto: form.kapcsolattarto.value
+    <label>Szint
+      <input id="hibaSzint" placeholder="pl. 2. szint">
+    </label>
+
+    <label>Gyártó
+      <input id="hibaGyarto" placeholder="pl. Jungheinrich">
+    </label>
+
+    <label>Alkatrész
+      <select id="hibaAlkatresz">
+        <option>Talplemez/Talpcsavar</option>
+        <option>Állványláb</option>
+        <option>Protektor</option>
+        <option>Keretösszekötő</option>
+        <option>Tartógerenda</option>
+        <option>Túltolásgátló</option>
+        <option>Biztosítószeg</option>
+      </select>
+    </label>
+
+    <label>Sérülési osztály
+      <select id="hibaSO">
+        <option>Zöld</option>
+        <option>Sárga</option>
+        <option>Piros</option>
+      </select>
+    </label>
+
+    <button class="secondary-button" id="addIssue" type="button">
+      HIBA HOZZÁADÁSA
+    </button>
+  </div>
+
+  <div id="issueList"></div>
+
+  <button id="closeProject" class="primary-button" type="button" style="margin-top:24px;">
+    Felülvizsgálat vége
+  </button>
+
+</section>
+
+<script>
+  let project = {
+    meta: {},
+    hibak: []
+  };
+
+  const save = () =>
+    localStorage.setItem('currentProject', JSON.stringify(project));
+
+  const load = () => {
+    const data = localStorage.getItem('currentProject');
+    if (data) project = JSON.parse(data);
+  };
+
+  const datumInput = document.getElementById('datum');
+  datumInput.value = new Date().toISOString().split('T')[0];
+
+  load();
+
+  if (project.meta.ugyfelNev) {
+    Object.keys(project.meta).forEach(k => {
+      const el = document.getElementById(k);
+      if (el) el.value = project.meta[k];
+    });
+    showIssues();
+  }
+
+  document.getElementById('toIssues').onclick = () => {
+    project.meta = {
+      ugyfelNev: ugyfelNev.value,
+      helyszin: helyszin.value,
+      vizsgalo: vizsgalo.value,
+      datum: datum.value,
+      kapcsolattarto: kapcsolattarto.value
     };
+    save();
+    showIssues();
+  };
 
-    //  megjelenítés felül
-    osszegzesSzoveg.textContent =
-      `${data.ugyfelNev} – ${data.helyszin} – ${data.datum}`;
-    osszegzes.style.display = 'block';
+  function showIssues() {
+    document.getElementById('step-project').style.display = 'none';
+    document.getElementById('step-issues').style.display = 'block';
 
-    //  fájl mentés (JSON)
-    const blob = new Blob(
-      [JSON.stringify(data, null, 2)],
-      { type: 'application/json' }
-    );
+    projectSummary.textContent =
+      `${project.meta.ugyfelNev} – ${project.meta.helyszin} – ${project.meta.datum} – ${project.meta.vizsgalo}`;
 
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `felulvizsgalat_${Date.now()}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
+    renderIssues();
+  }
 
-    // Új sor gomb megjelenítése
-    ujSorBtn.style.display = 'block';
+  document.getElementById('addIssue').onclick = () => {
+    project.hibak.push({
+      tarhelyazonosito: hibaTA.value,
+      sor: hibaSor.value,
+      szint: hibaSzint.value,
+      gyarto: hibaGyarto.value,
+      alkatresz: hibaAlkatresz.value,
+      serulesiO: hibaSO.value
+    });
 
-    // form lezárása (opcionális)
-    form.querySelectorAll('input').forEach(i => i.disabled = true);
-  });
+    hibaTA.value = '';
+    //hibaSor.value = '';
+    hibaSzint.value='';
+    //hibaGyarto.value='';
+    save();
+    renderIssues();
+  };
 
-  ujSorBtn.addEventListener('click', () => {
-    form.reset();
-    form.querySelectorAll('input').forEach(i => i.disabled = false);
-    //osszegzes.style.display = 'none';
-    //ujSorBtn.style.display = 'none';
+  function renderIssues() {
+    issueList.innerHTML = '';
+    project.hibak.forEach((h, i) => {
+      issueList.innerHTML += `
+        <div class="issue ${severityClass(h.serulesiO)}">
+          <b>${i + 1}. hiba</b> ${h.tarhelyazonosito}<br>
+          sor: ${h.sor}, szint: ${h.szint}<br>
+          gyártó: ${h.gyarto}<br>
+          alkatrész: ${h.alkatresz}<br>
+          ${h.serulesiO}
+        </div>`;
+    });
+  }
 
-    form.datum.value =
-      new Date().toISOString().split('T')[0];
-  });
+  function severityClass(s) {
+    if (s === 'Zöld') return 'zold';
+    if (s === 'Sárga') return 'sarga';
+    if (s === 'Piros') return 'piros';
+    return '';
+  }
 
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('sw.js');
   }
+
+  document.getElementById('closeProject').onclick = () => {
+  // jelöld lezártnak
+  project.closedAt = new Date().toISOString();
+
+  // fájl export (később itt lesz PDF)
+  const blob = new Blob(
+    [JSON.stringify(project, null, 2)],
+    { type: 'application/json' }
+  );
+
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'projekt_' + project.meta.ugyfelNev.replace(/\s+/g, '_') + '.json';
+  a.click();
+
+  // HIBALISTA TÖRLÉSE
+  project = {
+    meta: {},
+    hibak: []
+  };
+
+  // törlés az aktív munkából
+  localStorage.removeItem('currentProject');
+
+// UI vissza alapállapotba
+  document.getElementById('issueList').innerHTML = '';
+  document.getElementById('step-issues').style.display = 'none';
+  document.getElementById('step-project').style.display = 'block';
+
+  ugyfelNev.value = '';
+  helyszin.value = '';
+  kapcsolattarto.value = '';
+
+  alert('Felülvizsgálat anyaga letöltve.');
+
+};
+
 </script>
 
 </body>
