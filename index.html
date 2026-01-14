@@ -1,18 +1,81 @@
+<!DOCTYPE html>
+<html lang="hu">
 <head>
   <meta charset="UTF-8">
   <title>Főoldal</title>
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#1976d2">
+  <meta name="theme-color" content="#000000">
   <link rel="manifest" href="manifest.json">
+
+  <style>
+    body {
+      margin: 0;
+      padding: 24px;
+      font-family: system-ui, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background: #000;
+    }
+
+    .container {
+      text-align: center;
+    }
+
+    .title {
+      font-size: 2rem;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      margin-bottom: 32px;
+    }
+
+    .title .raktar {
+      color: #ffffff;
+    }
+
+    .title .szerviz {
+      color: #FDC024;
+    }
+
+    button {
+      background-color: #FDC024;
+      color: #000;
+      border: none;
+      border-radius: 14px;
+      padding: 18px 28px;
+      font-size: 1.1rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      cursor: pointer;
+      width: 100%;
+      max-width: 360px;
+    }
+
+    button:active {
+      transform: scale(0.97);
+    }
+  </style>
 </head>
 
 <body>
-  <button onclick="location.href='app.html'">Új felülvizsgálat indítása</button>
+
+  <div class="container">
+    <div class="title">
+      <span class="raktar">RAKTÁR</span><span class="szerviz">SZERVIZ</span>
+    </div>
+
+    <button onclick="location.href='app.html'">
+      Új felülvizsgálat indítása
+    </button>
+  </div>
 
   <script>
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('sw.js');
     }
   </script>
+
 </body>
+</html>
