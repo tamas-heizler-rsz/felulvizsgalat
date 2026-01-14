@@ -1,20 +1,112 @@
+<!DOCTYPE html>
+<html lang="hu">
 <head>
   <meta charset="UTF-8">
-  <title>Alkalmazás</title>
+  <title>Vizsgálati adatok</title>
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#1976d2">
-  <link rel="manifest" href="manifest.json">
+  <link rel="manifest" href="./manifest.json">
+
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      margin: 0;
+      padding: 16px;
+      background: #f5f5f5;
+    }
+
+    h1 {
+      font-size: 1.4rem;
+      margin-bottom: 16px;
+    }
+
+    form {
+      background: white;
+      padding: 16px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    label {
+      display: block;
+      margin-top: 12px;
+      font-weight: 600;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      margin-top: 4px;
+      font-size: 1rem;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      margin-top: 20px;
+      width: 100%;
+      padding: 12px;
+      font-size: 1rem;
+      border: none;
+      border-radius: 10px;
+      background: #1976d2;
+      color: white;
+    }
+  </style>
 </head>
 
 <body>
-  <h1>PDF generálás</h1>
 
-  <script src="app.js"></script>
+  <h1>Vizsgálati adatok</h1>
+
+  <form id="adatForm">
+
+    <label>
+      Ügyfél neve
+      <input type="text" name="ugyfelNev" required>
+    </label>
+
+    <label>
+      Helyszín
+      <input type="text" name="helyszin" required>
+    </label>
+
+    <label>
+      Vizsgáló
+      <input type="text" name="vizsgalo" required>
+    </label>
+
+    <label>
+      Dátum
+      <input type="date" name="datum" id="datum">
+    </label>
+
+    <label>
+      Kapcsolattartó
+      <input type="text" name="kapcsolattarto">
+    </label>
+
+    <button type="submit">Mentés</button>
+
+  </form>
 
   <script>
+    // dátum alapértelmezése: ma
+    document.getElementById('datum').value =
+      new Date().toISOString().split('T')[0];
+
+    // Service Worker
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('sw.js');
     }
+
+    // form submit (egyelőre csak teszt)
+    document.getElementById('adatForm').addEventListener('submit', e => {
+      e.preventDefault();
+      alert('Űrlap mentve (egyelőre csak teszt)');
+    });
   </script>
+
 </body>
+</html>
