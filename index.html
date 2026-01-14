@@ -1,22 +1,18 @@
-<!DOCTYPE html>
-<html lang="hu">
 <head>
   <meta charset="UTF-8">
-  <title>PDF generáló</title>
+  <title>Főoldal</title>
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#1976d2">
-
   <link rel="manifest" href="manifest.json">
 </head>
+
 <body>
+  <button onclick="location.href='app.html'">Belépés</button>
 
-  <h1>PDF generáló alkalmazás</h1>
-  <p>Kattints a belépéshez:</p>
-
-  <button onclick="location.href='app.html'">
-    Alkalmazás megnyitása
-  </button>
-
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js');
+    }
+  </script>
 </body>
-</html>
