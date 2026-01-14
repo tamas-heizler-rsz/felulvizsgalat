@@ -1,6 +1,6 @@
 {
-  "name": "PDF generáló",
-  "short_name": "PDFApp",
+  "name": "Állványfelülvizsgálat",
+  "short_name": "Felülvizsgálat",
   "start_url": "index.html",
   "display": "standalone",
   "background_color": "#ffffff",
