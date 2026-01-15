@@ -59,6 +59,11 @@
       border-color: #FDC024;
     }
 
+    .project-summary {
+      margin-bottom: 2px;   /* kevesebb hely alatta */
+      font-size: 1rem;
+    }
+
     .primary-button {
       background: #FDC024;
       color: #000;
@@ -83,6 +88,11 @@
       text-transform: uppercase;
       cursor: pointer;
       margin-top: 12px;
+    }
+
+    .close-button {
+      margin-top: 8px;
+      margin-bottom: 24px; /* nagyobb üres hely a form előtt */
     }
 
     .issue {
@@ -148,7 +158,11 @@
 <!-- HIBALISTA -->
 <section id="step-issues" style="display:none">
 
-  <h2 id="projectSummary"></h2>
+  <h2 id="projectSummary" class="project-summary"></h2>
+
+  <button id="closeProject" class="primary-button close-button" type="button" style="margin-top:24px;">
+    Felülvizsgálat vége
+  </button>
 
   <div class="card">
     <label>Tárhelyazonosító
@@ -160,11 +174,11 @@
     </label>
 
     <label>Szint
-      <input id="hibaSzint" placeholder="pl. 2. szint">
+      <input id="hibaSzint" placeholder="pl. 2. szint" type="number" step="1" min="1" inputmode="numeric">
     </label>
 
     <label>Gyártó
-      <input id="hibaGyarto" placeholder="pl. Jungheinrich">
+      <input id="hibaGyarto" placeholder="pl. Jungheinrich" list="gyartoLista">
     </label>
 
     <label>Alkatrész
@@ -172,20 +186,47 @@
         <option>Talplemez/Talpcsavar</option>
         <option>Állványláb</option>
         <option>Protektor</option>
-        <option>Keretösszekötő</option>
+        <option selected>Keretösszekötő</option>
         <option>Tartógerenda</option>
         <option>Túltolásgátló</option>
         <option>Biztosítószeg</option>
       </select>
     </label>
 
+    <label id="EHLabel" style="display:none;">
+      Első vagy hátsó
+      <select id="hibaEH">
+        <option selected>Első</option>
+        <option>Hátsó</option>
+      </select>
+    </label>
+
+    <label id="JCSLabel" style="display:none;">
+      Javítás vagy csere
+      <select id="hibaJCS">
+        <option>Javítás</option>
+        <option selected>Csere</option>
+      </select>
+    </label>
+
     <label>Sérülési osztály
       <select id="hibaSO">
         <option>Zöld</option>
-        <option>Sárga</option>
+        <option selected>Sárga</option>
         <option>Piros</option>
       </select>
     </label>
+
+    <label>Megjegyzés
+      <input id="hibaMegj" placeholder="pl. egyedi színű az alkatrész">
+    </label>
+
+    <datalist id="gyartoLista">
+      <option value="Jungheinrich">
+      <option value="Dexion">
+      <option value="STOW">
+      <option value="Galler">
+    </datalist>
 
     <button class="secondary-button" id="addIssue" type="button">
       HIBA HOZZÁADÁSA
@@ -194,9 +235,6 @@
 
   <div id="issueList"></div>
 
-  <button id="closeProject" class="primary-button" type="button" style="margin-top:24px;">
-    Felülvizsgálat vége
-  </button>
 
 </section>
 
@@ -205,6 +243,36 @@
     meta: {},
     hibak: []
   };
+
+//feltételes megjelenítés
+const alkatreszSelect = document.getElementById('hibaAlkatresz');
+    const ehLabel = document.getElementById('EHLabel');
+    const jcsLabel = document.getElementById('JCSLabel');
+
+    const ehRequired = [
+      'Állványláb',
+      'Tartógerenda'
+    ];
+    const jcsRequired = [
+      'Tartógerenda',
+      'Túltolásgátló'
+    ];
+
+    alkatreszSelect.addEventListener('change', () => {
+      if (ehRequired.includes(alkatreszSelect.value)) {
+        ehLabel.style.display = 'block';
+      } else {
+        ehLabel.style.display = 'none';
+        document.getElementById('hibaEH').value = '';
+      }
+      if (jcsRequired.includes(alkatreszSelect.value)) {
+        jcsLabel.style.display = 'block';
+      } else {
+        jcsLabel.style.display = 'none';
+        document.getElementById('hibaJCS').value = '';
+      }
+    });
+    //feltételes megjelenítés vége
 
   const save = () =>
     localStorage.setItem('currentProject', JSON.stringify(project));
@@ -243,8 +311,8 @@
     document.getElementById('step-project').style.display = 'none';
     document.getElementById('step-issues').style.display = 'block';
 
-    projectSummary.textContent =
-      `${project.meta.ugyfelNev} – ${project.meta.helyszin} – ${project.meta.datum} – ${project.meta.vizsgalo}`;
+    projectSummary.innerHTML =
+      `${project.meta.ugyfelNev}<br>${project.meta.helyszin}<br>${project.meta.datum}<br>${project.meta.vizsgalo}`;
 
     renderIssues();
   }
@@ -256,13 +324,21 @@
       szint: hibaSzint.value,
       gyarto: hibaGyarto.value,
       alkatresz: hibaAlkatresz.value,
-      serulesiO: hibaSO.value
+      elsohatso: hibaEH.value,
+      javitascsere: hibaJCS.value,
+      serulesiO: hibaSO.value,
+      megjegyzes: hibaMegj.value
     });
-
+    //visszaállítás alapértékre
     hibaTA.value = '';
     //hibaSor.value = '';
     hibaSzint.value='';
     //hibaGyarto.value='';
+    hibaAlkatresz.value='Keretösszekötő';
+    hibaEH.value='Első';
+    hibaJCS.valu='Csere';
+    hibaSO.value='Sárga';
+    hibaMegj.value='';
     save();
     renderIssues();
   };
@@ -276,6 +352,8 @@
           sor: ${h.sor}, szint: ${h.szint}<br>
           gyártó: ${h.gyarto}<br>
           alkatrész: ${h.alkatresz}<br>
+          első/hátsó: ${h.elsohatso}<br>
+          javítás/csere: ${h.javitascsere}<br>
           ${h.serulesiO}
         </div>`;
     });
