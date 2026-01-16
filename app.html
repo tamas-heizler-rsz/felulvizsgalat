@@ -160,6 +160,10 @@
       <input id="ugyfelNev" placeholder="pl. Cégnév Kft.">
     </label>
 
+    <label>Kapcsolattartó
+      <input id="kapcsolattarto" placeholder="pl. Gipsz Jakab">
+    </label>
+
     <label>Helyszín
       <input id="helyszin" placeholder="pl. Budapest, Raktár utca 1.">
     </label>
@@ -168,12 +172,15 @@
       <input id="vizsgalo" placeholder="pl. Heizler Tamás" onclick="this.value=''" list="vizsgaloLista">
     </label>
 
-    <label>Dátum
-      <input type="date" id="datum">
+    <label>Projekt
+      <select id="vizsgaloCeg">
+        <option selected>Jungheinrich</option>
+        <option>Raktártechnika</option>
+      </select>
     </label>
 
-    <label>Kapcsolattartó
-      <input id="kapcsolattarto" placeholder="pl. Gipsz Jakab">
+    <label>Dátum
+      <input type="date" id="datum">
     </label>
 
     <datalist id="vizsgaloLista">
@@ -198,6 +205,10 @@
   </button>
 
   <div class="card">
+    <label>Terület
+      <input id="hibaTerulet" placeholder="pl. Alapanyagraktár" onclick="this.value=''" list="teruletLista">
+    </label>
+
     <label>Tárhelyazonosító
       <input id="hibaTA" placeholder="pl. A-0101">
     </label>
@@ -240,6 +251,7 @@
       <select id="hibaEH">
         <option selected>Első</option>
         <option>Hátsó</option>
+        <option>Első & hátsó</option>
       </select>
     </label>
 
@@ -277,6 +289,19 @@
       <option value="Dexion">
       <option value="STOW">
       <option value="Galler">
+    </datalist>
+
+    <datalist id="teruletLista">
+      <option value="Alapanyag">
+      <option value="Készáru">
+      <option value="Csomagolóanyag">
+      <option value="Kiszállítási terület">
+      <option value="Bejövő">
+      <option value="Külső">
+      <option value="Sátor">
+      <option value="Labor">
+      <option value="Karbantartás">
+      <option value="Raktár">
     </datalist>
 
     <button class="secondary-button" id="addIssue" type="button">
@@ -402,10 +427,11 @@ const alkatreszSelect = document.getElementById('hibaAlkatresz');
   document.getElementById('toIssues').onclick = () => {
     project.meta = {
       ugyfelNev: ugyfelNev.value,
+      kapcsolattarto: kapcsolattarto.value,
       helyszin: helyszin.value,
       vizsgalo: vizsgalo.value,
+      projekt: vizsgaloCeg.value,
       datum: datum.value,
-      kapcsolattarto: kapcsolattarto.value
     };
     save();
     showIssues();
@@ -461,13 +487,14 @@ const alkatreszSelect = document.getElementById('hibaAlkatresz');
     document.getElementById('step-issues').style.display = 'block';
 
     projectSummary.innerHTML =
-      `${project.meta.ugyfelNev}<br>${project.meta.helyszin}<br>${project.meta.datum}<br>${project.meta.vizsgalo}`;
+      `${project.meta.ugyfelNev}<br>${project.meta.helyszin}<br>${project.meta.datum}<br>${project.meta.vizsgalo}<br>${project.meta.projekt}`;
 
     renderIssues();
   }
 
   document.getElementById('addIssue').onclick = () => {
     project.hibak.push({
+      terulet: hibaTerulet.value,
       tarhelyazonosito: hibaTA.value,
       sor: hibaSor.value,
       szint: hibaSzint.value,
@@ -485,7 +512,7 @@ const alkatreszSelect = document.getElementById('hibaAlkatresz');
     //visszaállítás alapértékre
     hibaTA.value = '';
     //hibaSor.value = '';
-    hibaSzint.value='1';
+    hibaSzint.value='0';
     //hibaGyarto.value='';
     hibaAlkatresz.value='';
     hibaEH.value='Első';
@@ -496,6 +523,9 @@ const alkatreszSelect = document.getElementById('hibaAlkatresz');
     hibaMeretMag.value='';
     hibaMeretSzel.value='';
     hibaMeretVast.value='';
+    meretLabel.style.display = 'none';
+    jcsLabel.style.display = 'none';
+    ehLabel.style.display = 'none';
     save();
     renderIssues();
   };
@@ -509,18 +539,18 @@ const alkatreszSelect = document.getElementById('hibaAlkatresz');
   });
 
   document.getElementById('ugyfelNev').addEventListener('change', () => {
+  document.getElementById('kapcsolattarto').focus();
+  });
+  document.getElementById('kapcsolattarto').addEventListener('change', () => {
   document.getElementById('helyszin').focus();
   });
   document.getElementById('helyszin').addEventListener('change', () => {
   document.getElementById('vizsgalo').focus();
   });
   document.getElementById('vizsgalo').addEventListener('change', () => {
-  document.getElementById('kapcsolattarto').focus();
+  document.getElementById('vizsgaloCeg').focus();
   });
-  document.getElementById('datum').addEventListener('change', () => {
-  document.getElementById('kapcsolattarto').focus();
-  });
-  document.getElementById('kapcsolattarto').addEventListener('change', () => {
+  document.getElementById('vizsgaloCeg').addEventListener('change', () => {
     document.getElementById('toIssues').focus();
   });
 
@@ -530,6 +560,7 @@ const alkatreszSelect = document.getElementById('hibaAlkatresz');
       issueList.innerHTML += `
         <div class="issue ${severityClass(h.serulesiO)}">
           <b>${i + 1}. hiba</b> ${h.tarhelyazonosito}<br>
+          terület: ${h.terulet}<br>
           sor: ${h.sor}, szint: ${h.szint}<br>
           gyártó: ${h.gyarto}<br>
           alkatrész: ${h.alkatresz}<br>
