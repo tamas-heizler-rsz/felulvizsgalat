@@ -103,21 +103,48 @@
       margin-top: 10px;
       font-size: 0.9rem;
     }
+    .number-control {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
 
-.issue.zold {
-  background: #d4edda;
-  border-left: 6px solid #28a745;
-}
+    .number-control input {
+      width: 80%;
+      text-align: center;
+    }
 
-.issue.sarga {
-  background: #fff3cd;
-  border-left: 6px solid #ffc107;
-}
+    .meretmegadas {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
 
-.issue.piros {
-  background: #f8d7da;
-  border-left: 6px solid #dc3545;
-}
+    .step-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: none;
+      background: #FDC024;
+      color: #000;
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    .issue.zold {
+      background: #d4edda;
+      border-left: 6px solid #28a745;
+    }
+
+    .issue.sarga {
+      background: #fff3cd;
+      border-left: 6px solid #ffc107;
+    }
+
+    .issue.piros {
+      background: #f8d7da;
+      border-left: 6px solid #dc3545;
+    }
 
   </style>
 </head>
@@ -138,7 +165,7 @@
     </label>
 
     <label>Vizsgáló
-      <input id="vizsgalo" placeholder="pl. Heizler Tamás">
+      <input id="vizsgalo" placeholder="pl. Heizler Tamás" onclick="this.value=''" list="vizsgaloLista">
     </label>
 
     <label>Dátum
@@ -148,6 +175,12 @@
     <label>Kapcsolattartó
       <input id="kapcsolattarto" placeholder="pl. Gipsz Jakab">
     </label>
+
+    <datalist id="vizsgaloLista">
+      <option value="Kaszás Gergely">
+      <option value="Gráff Péter">
+      <option value="Heizler Tamás">
+    </datalist>
 
     <button class="primary-button" id="toIssues">
       TOVÁBB
@@ -170,11 +203,19 @@
     </label>
 
     <label>Sor
-      <input id="hibaSor" placeholder="pl. 1. sor">
+    <div class="number-control">
+    <button type="button" class="step-btn" data-target="hibaSor" data-step="-1" tabindex="-1">−</button>
+    <input id="hibaSor" placeholder="pl. 1. sor" step="1" tabindex="-1">
+    <button type="button" class="step-btn" data-target="hibaSor" data-step="1">+</button>
+    </div>
     </label>
 
     <label>Szint
-      <input id="hibaSzint" placeholder="pl. 2. szint" type="number" step="1" min="1" inputmode="numeric">
+    <div class="number-control">
+    <button type="button" class="step-btn" data-target="hibaSzint" data-step="-1" tabindex="-1">−</button>
+    <input id="hibaSzint" placeholder="pl. 2. szint" type="number" step="1" tabindex="-1" min="1" inputmode="numeric">
+    <button type="button" class="step-btn" data-target="hibaSzint" data-step="1">+</button>
+    </div>
     </label>
 
     <label>Gyártó
@@ -186,10 +227,11 @@
         <option>Talplemez/Talpcsavar</option>
         <option>Állványláb</option>
         <option>Protektor</option>
-        <option selected>Keretösszekötő</option>
+        <option>Keretösszekötő</option>
         <option>Tartógerenda</option>
         <option>Túltolásgátló</option>
         <option>Biztosítószeg</option>
+        <option>Egyéb</option>
       </select>
     </label>
 
@@ -207,6 +249,15 @@
         <option>Javítás</option>
         <option selected>Csere</option>
       </select>
+    </label>
+
+    <label id="meretLabel" style="display:none;">Méret
+    <div class = "meretmegadas">
+    <input id="hibaMeretHossz" type="number" placeholder="hosszúság">
+    <input id="hibaMeretMag" type="number" placeholder="magaság">
+    <input id="hibaMeretSzel" type="number" placeholder="szélesség" >
+    <input id="hibaMeretVast" type="number" placeholder="vastagság" >
+    </div>
     </label>
 
     <label>Sérülési osztály
@@ -248,6 +299,7 @@
 const alkatreszSelect = document.getElementById('hibaAlkatresz');
     const ehLabel = document.getElementById('EHLabel');
     const jcsLabel = document.getElementById('JCSLabel');
+    const meretLabel = document.getElementById('meretLabel');
 
     const ehRequired = [
       'Állványláb',
@@ -256,6 +308,32 @@ const alkatreszSelect = document.getElementById('hibaAlkatresz');
     const jcsRequired = [
       'Tartógerenda',
       'Túltolásgátló'
+    ];
+    const meretRequired = [
+      'Állványláb',
+      'Protektor',
+      'Keretösszekötő',
+      'Tartógerenda',
+      'Túltolásgátló'
+    ];
+    const meretHosszRequired = [
+      'Keretösszekötő',
+      'Tartógerenda',
+      'Túltolásgátló'
+    ];
+    const meretMagRequired = [
+      'Állványláb',
+      'Protektor',
+      'Tartógerenda',
+    ];
+    const meretSzelRequired = [
+      'Állványláb',
+      'Protektor',
+      'Keretösszekötő',
+      'Tartógerenda',
+    ];
+    const meretVastRequired = [
+      'Állványláb',
     ];
 
     alkatreszSelect.addEventListener('change', () => {
@@ -270,6 +348,32 @@ const alkatreszSelect = document.getElementById('hibaAlkatresz');
       } else {
         jcsLabel.style.display = 'none';
         document.getElementById('hibaJCS').value = '';
+      }
+      if (meretRequired.includes(alkatreszSelect.value)) {
+        meretLabel.style.display = 'block';
+        if (meretHosszRequired.includes(alkatreszSelect.value)) {
+          hibaMeretHossz.style.display = 'block';
+        }
+        else {hibaMeretHossz.style.display = 'none';}
+        if (meretMagRequired.includes(alkatreszSelect.value)) {
+          hibaMeretMag.style.display = 'block';
+        }
+        else {hibaMeretMag.style.display = 'none';}
+        if (meretSzelRequired.includes(alkatreszSelect.value)) {
+          hibaMeretSzel.style.display = 'block';
+        }
+        else {hibaMeretSzel.style.display = 'none';}
+        if (meretVastRequired.includes(alkatreszSelect.value)) {
+          hibaMeretVast.style.display = 'block';
+        }
+        else {hibaMeretVast.style.display = 'none';}
+
+      } else {
+        meretLabel.style.display = 'none';
+        document.getElementById('hibaMeretMag').value = '';
+        document.getElementById('hibaMeretHossz').value = '';
+        document.getElementById('hibaMeretSzel').value = '';
+        document.getElementById('hibaMeretVast').value = '';
       }
     });
     //feltételes megjelenítés vége
@@ -307,6 +411,51 @@ const alkatreszSelect = document.getElementById('hibaAlkatresz');
     showIssues();
   };
 
+  //léptető
+  document.querySelectorAll('.step-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const input = document.getElementById(btn.dataset.target);
+      const step = Number(btn.dataset.step);
+      let value = input.value.trim();
+
+    // ÜRES → 0
+      if (value === '') {
+        input.value = Math.max(0, step);
+        input.focus();
+        return;
+      }
+
+      // Ha szám
+      if (/^\d+$/.test(value)) {
+        let num = parseInt(value, 10) + step;
+        if (num < 0) num = 0;
+        input.value = num;
+      }
+
+      // Ha egyetlen betű (A–Z vagy a–z)
+      else if (/^[a-zA-Z]$/.test(value)) {
+        let code = value.charCodeAt(0) + step;
+
+        // nagybetűk
+        if (value >= 'A' && value <= 'Z') {
+          if (code < 65) code = 90;
+          if (code > 90) code = 65;
+        }
+
+        // kisbetűk
+        if (value >= 'a' && value <= 'z') {
+          if (code < 97) code = 122;
+          if (code > 122) code = 97;
+        }
+
+        input.value = String.fromCharCode(code);
+      }
+
+      input.focus();
+    });
+  });
+  //léptető vége
+
   function showIssues() {
     document.getElementById('step-project').style.display = 'none';
     document.getElementById('step-issues').style.display = 'block';
@@ -326,22 +475,54 @@ const alkatreszSelect = document.getElementById('hibaAlkatresz');
       alkatresz: hibaAlkatresz.value,
       elsohatso: hibaEH.value,
       javitascsere: hibaJCS.value,
+      meretMag: hibaMeretMag.value,
+      meretHossz: hibaMeretHossz.value,
+      meretSzel: hibaMeretSzel.value,
+      meretVast: hibaMeretVast.value,
       serulesiO: hibaSO.value,
       megjegyzes: hibaMegj.value
     });
     //visszaállítás alapértékre
     hibaTA.value = '';
     //hibaSor.value = '';
-    hibaSzint.value='';
+    hibaSzint.value='1';
     //hibaGyarto.value='';
-    hibaAlkatresz.value='Keretösszekötő';
+    hibaAlkatresz.value='';
     hibaEH.value='Első';
-    hibaJCS.valu='Csere';
+    hibaJCS.value='Csere';
     hibaSO.value='Sárga';
     hibaMegj.value='';
+    hibaMeretHossz.value='';
+    hibaMeretMag.value='';
+    hibaMeretSzel.value='';
+    hibaMeretVast.value='';
     save();
     renderIssues();
   };
+
+  //ugrás a következő input mezőre
+  document.getElementById('hibaGyarto').addEventListener('change', () => {
+  document.getElementById('hibaAlkatresz').focus();
+  });
+  document.getElementById('addIssue').addEventListener('click', () => {
+  document.getElementById('hibaTA').focus();
+  });
+
+  document.getElementById('ugyfelNev').addEventListener('change', () => {
+  document.getElementById('helyszin').focus();
+  });
+  document.getElementById('helyszin').addEventListener('change', () => {
+  document.getElementById('vizsgalo').focus();
+  });
+  document.getElementById('vizsgalo').addEventListener('change', () => {
+  document.getElementById('kapcsolattarto').focus();
+  });
+  document.getElementById('datum').addEventListener('change', () => {
+  document.getElementById('kapcsolattarto').focus();
+  });
+  document.getElementById('kapcsolattarto').addEventListener('change', () => {
+    document.getElementById('toIssues').focus();
+  });
 
   function renderIssues() {
     issueList.innerHTML = '';
@@ -354,6 +535,7 @@ const alkatreszSelect = document.getElementById('hibaAlkatresz');
           alkatrész: ${h.alkatresz}<br>
           első/hátsó: ${h.elsohatso}<br>
           javítás/csere: ${h.javitascsere}<br>
+          méret: ${h.meretHossz}x${h.meretMag}x${h.meretSzel}x${h.meretVast}<br>
           ${h.serulesiO}
         </div>`;
     });
