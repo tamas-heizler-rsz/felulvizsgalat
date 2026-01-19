@@ -38,6 +38,14 @@
       margin-bottom: 24px;
     }
 
+    textarea {
+      width: 100%;
+      box-sizing: border-box;
+      resize: none;        /* ne lehessen kézzel húzni */
+      overflow: hidden;    /* ne legyen scroll */
+      min-height: 2.5em;
+    }
+
     label {
       display: block;
       margin-bottom: 14px;
@@ -145,7 +153,17 @@
       background: #f8d7da;
       border-left: 6px solid #dc3545;
     }
-
+    .file-button {
+      display: inline-block;
+      background: #FDC024;
+      color: black;
+      font-weight: bold;
+      padding: 12px 20px;
+      border-radius: 16px;
+      text-transform: uppercase;
+      cursor: pointer;
+      text-align: center;
+    }
   </style>
 </head>
 
@@ -281,14 +299,44 @@
     </label>
 
     <label>Megjegyzés
-      <input id="hibaMegj" placeholder="pl. egyedi színű az alkatrész">
+      <textarea
+        id="hibaMegj"
+        placeholder="Megjegyzés"
+        rows="2"
+      ></textarea>
+    </label>
+
+    <label>
+      Fénykép
+      <input 
+        type="file"
+        id="hibaFoto"
+        accept="image/*"
+        capture="environment"
+      >
     </label>
 
     <datalist id="gyartoLista">
       <option value="Jungheinrich">
+      <option value="AR Rack">
+      <option value="Armes">
+      <option value="BITO">
       <option value="Dexion">
-      <option value="STOW">
+      <option value="Elvedi">
+      <option value="Esmena">
+      <option value="Esnova">
+      <option value="Feralco">
       <option value="Galler">
+      <option value="ITS">
+      <option value="Mecalux">
+      <option value="META">
+      <option value="Nedcon">
+      <option value="SLP">
+      <option value="SSI Schäfer">
+      <option value="STOW">
+      <option value="Tegometall">
+      <option value="Torri">
+      <option value="Toyota">
     </datalist>
 
     <datalist id="teruletLista">
@@ -320,6 +368,14 @@
     hibak: []
   };
 
+//automatikus megnövelés
+  const autoResize = (el) => {
+  el.style.height = 'auto';
+  el.style.height = el.scrollHeight + 'px';
+};
+const megj = document.getElementById('hibaMegj');
+megj.addEventListener('input', () => autoResize(megj));
+
 //feltételes megjelenítés
 const alkatreszSelect = document.getElementById('hibaAlkatresz');
     const ehLabel = document.getElementById('EHLabel');
@@ -349,6 +405,7 @@ const alkatreszSelect = document.getElementById('hibaAlkatresz');
     const meretMagRequired = [
       'Állványláb',
       'Protektor',
+      'Keretösszekötő',
       'Tartógerenda',
     ];
     const meretSzelRequired = [
@@ -492,7 +549,14 @@ const alkatreszSelect = document.getElementById('hibaAlkatresz');
     renderIssues();
   }
 
-  document.getElementById('addIssue').onclick = () => {
+  document.getElementById('addIssue').onclick = async () => {
+  let fotoData = null;
+  const fileInput = document.getElementById('hibaFoto');
+
+  if (fileInput.files.length > 0) {
+    const file = fileInput.files[0];
+    fotoData = await fileToBase64(file);
+  }
     project.hibak.push({
       terulet: hibaTerulet.value,
       tarhelyazonosito: hibaTA.value,
@@ -507,9 +571,11 @@ const alkatreszSelect = document.getElementById('hibaAlkatresz');
       meretSzel: hibaMeretSzel.value,
       meretVast: hibaMeretVast.value,
       serulesiO: hibaSO.value,
-      megjegyzes: hibaMegj.value
+      megjegyzes: hibaMegj.value,
+      foto: fotoData
     });
     //visszaállítás alapértékre
+    fileInput.value = ''; // reset fotó
     hibaTA.value = '';
     //hibaSor.value = '';
     hibaSzint.value='0';
@@ -529,6 +595,14 @@ const alkatreszSelect = document.getElementById('hibaAlkatresz');
     save();
     renderIssues();
   };
+
+  function fileToBase64(file) {
+    return new Promise(resolve => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.readAsDataURL(file);
+    });
+  }
 
   //ugrás a következő input mezőre
   document.getElementById('hibaGyarto').addEventListener('change', () => {
@@ -567,7 +641,8 @@ const alkatreszSelect = document.getElementById('hibaAlkatresz');
           első/hátsó: ${h.elsohatso}<br>
           javítás/csere: ${h.javitascsere}<br>
           méret: ${h.meretHossz}x${h.meretMag}x${h.meretSzel}x${h.meretVast}<br>
-          ${h.serulesiO}
+          sérülési osztály: ${h.serulesiO}<br>
+          megjegyzés: ${h.megjegyzes}
         </div>`;
     });
   }
