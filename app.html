@@ -555,7 +555,7 @@ const alkatreszSelect = document.getElementById('hibaAlkatresz');
 
   if (fileInput.files.length > 0) {
     const file = fileInput.files[0];
-    fotoData = await fileToBase64(file);
+    fotoData = await fileToBase64Resized(file);
   }
     project.hibak.push({
       terulet: hibaTerulet.value,
@@ -596,10 +596,36 @@ const alkatreszSelect = document.getElementById('hibaAlkatresz');
     renderIssues();
   };
 
-  function fileToBase64(file) {
+  function fileToBase64Resized(file, maxWidth = 1280, quality = 0.75) {
     return new Promise(resolve => {
+      const img = new Image();
       const reader = new FileReader();
-      reader.onload = () => resolve(reader.result);
+
+      reader.onload = e => {
+        img.onload = () => {
+          let { width, height } = img;
+
+          // arányos méretezés
+          if (width > maxWidth) {
+            height = Math.round(height * (maxWidth / width));
+            width = maxWidth;
+          }
+
+          const canvas = document.createElement('canvas');
+          canvas.width = width;
+          canvas.height = height;
+
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+
+          // JPEG + tömörítés
+          const dataUrl = canvas.toDataURL('image/jpeg', quality);
+          resolve(dataUrl);
+        };
+
+        img.src = e.target.result;
+      };
+
       reader.readAsDataURL(file);
     });
   }
