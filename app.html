@@ -84,7 +84,25 @@
       cursor: pointer;
       width: 100%;
     }
+    .rendben-button {
+      background-color: #2e7d32; /* zöld */
+      color: white;
+      border: none;
+      border-radius: 16px;
+      padding: 6px 14px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin-bottom: 12px;
+    }
 
+    .rendben-button:hover {
+      background-color: #1b5e20;
+    }
+
+    .rendben-button:active {
+      transform: scale(0.96);
+    }
     .secondary-button {
       background: #FDC024;
       color: #000;
@@ -129,8 +147,8 @@
     }
 
     .step-btn {
-      width: 36px;
-      height: 36px;
+      width: 45px;
+      height: 45px;
       border-radius: 50%;
       border: none;
       background: #FDC024;
@@ -164,6 +182,7 @@
       cursor: pointer;
       text-align: center;
     }
+
   </style>
 </head>
 
@@ -227,6 +246,10 @@
       <input id="hibaTerulet" placeholder="pl. Alapanyagraktár" onclick="this.value=''" list="teruletLista">
     </label>
 
+    <button id="rendbenBtn" type="button" class="rendben-button" style="display:none;">
+      Terület rendben
+    </button>
+
     <label>Tárhelyazonosító
       <input id="hibaTA" placeholder="pl. A-0101">
     </label>
@@ -283,7 +306,7 @@
 
     <label id="meretLabel" style="display:none;">Méret
     <div class = "meretmegadas">
-    <input id="hibaMeretHossz" type="number" placeholder="hosszúság">
+    <input id="hibaMeretHossz" type="number" placeholder="hosszúság" onclick="this.value=''" list="meretGerendahosszLista">
     <input id="hibaMeretMag" type="number" placeholder="magaság">
     <input id="hibaMeretSzel" type="number" placeholder="szélesség" >
     <input id="hibaMeretVast" type="number" placeholder="vastagság" >
@@ -331,8 +354,10 @@
       <option value="Mecalux">
       <option value="META">
       <option value="Nedcon">
+      <option value="Polypal">
       <option value="SLP">
       <option value="SSI Schäfer">
+      <option value="Stockpal">
       <option value="STOW">
       <option value="Tegometall">
       <option value="Torri">
@@ -352,6 +377,14 @@
       <option value="Raktár">
     </datalist>
 
+    <datalist id="meretGerendahosszLista">
+      <option value="2700">
+      <option value="2200">
+      <option value="3600">
+      <option value="1900">
+      <option value="1800">        
+    </datalist>
+
     <button class="secondary-button" id="addIssue" type="button">
       HIBA HOZZÁADÁSA
     </button>
@@ -367,6 +400,16 @@
     meta: {},
     hibak: []
   };
+
+//terület rendben gomb megjelenése
+const teruletInput = document.getElementById('hibaTerulet');
+const rendbenBtn = document.getElementById('rendbenBtn');
+
+teruletInput.addEventListener('input', () => {
+  if (teruletInput.value.trim() !== '') {
+    rendbenBtn.style.display = 'inline-block';
+  }
+});
 
 //automatikus megnövelés
   const autoResize = (el) => {
@@ -549,6 +592,20 @@ const alkatreszSelect = document.getElementById('hibaAlkatresz');
     renderIssues();
   }
 
+  //terület rendben gomb
+  document.getElementById('rendbenBtn').onclick = () => {
+    project.hibak.push({
+      terulet: hibaTerulet.value,
+      rendben: true
+    });
+
+    save();
+    renderIssues();
+    rendbenBtn.style.display = 'none';
+    hibaTerulet.value = '';
+    document.getElementById('hibaTerulet').focus();
+  };
+
   document.getElementById('addIssue').onclick = async () => {
   let fotoData = null;
   const fileInput = document.getElementById('hibaFoto');
@@ -559,6 +616,7 @@ const alkatreszSelect = document.getElementById('hibaAlkatresz');
   }
     project.hibak.push({
       terulet: hibaTerulet.value,
+      rendben: false,
       tarhelyazonosito: hibaTA.value,
       sor: hibaSor.value,
       szint: hibaSzint.value,
@@ -574,6 +632,7 @@ const alkatreszSelect = document.getElementById('hibaAlkatresz');
       megjegyzes: hibaMegj.value,
       foto: fotoData
     });
+    rendbenBtn.style.display = 'none';
     //visszaállítás alapértékre
     fileInput.value = ''; // reset fotó
     hibaTA.value = '';
@@ -657,9 +716,10 @@ const alkatreszSelect = document.getElementById('hibaAlkatresz');
   function renderIssues() {
     issueList.innerHTML = '';
     project.hibak.forEach((h, i) => {
+      if (!h.rendben){
       issueList.innerHTML += `
         <div class="issue ${severityClass(h.serulesiO)}">
-          <b>${i + 1}. hiba</b> ${h.tarhelyazonosito}<br>
+          <b>${i + 1}. feljegyzés</b> ${h.tarhelyazonosito}<br>
           terület: ${h.terulet}<br>
           sor: ${h.sor}, szint: ${h.szint}<br>
           gyártó: ${h.gyarto}<br>
@@ -670,6 +730,14 @@ const alkatreszSelect = document.getElementById('hibaAlkatresz');
           sérülési osztály: ${h.serulesiO}<br>
           megjegyzés: ${h.megjegyzes}
         </div>`;
+      }
+      else {
+      issueList.innerHTML += `
+        <div class="issue ${severityClass(h.serulesiO)}">
+          <b>${i + 1}. feljegyzés</b><br>
+          terület rendben: ${h.terulet}
+        </div>`;
+      }
     });
   }
 
@@ -684,7 +752,7 @@ const alkatreszSelect = document.getElementById('hibaAlkatresz');
     navigator.serviceWorker.register('sw.js');
   }
 
-  document.getElementById('closeProject').onclick = () => {
+  document.getElementById('closeProject').onclick = async () => {
   // jelöld lezártnak
   project.closedAt = new Date().toISOString();
 
@@ -698,6 +766,30 @@ const alkatreszSelect = document.getElementById('hibaAlkatresz');
   a.href = URL.createObjectURL(blob);
   a.download = 'projekt_' + project.meta.ugyfelNev.replace(/\s+/g, '_') + '.json';
   a.click();
+
+  //Google Apps Script Export
+  // https://script.google.com/macros/s/AKfycbyj9dBOTkIDI5Ppd9vbRDKlKjisfW0eW2Rh_RIgoblzTyFzGgpuGgrxZPLYFfAuZJcmgA/exec
+
+
+
+
+  try {
+    const res = await fetch('https://script.google.com/macros/s/AKfycbyj9dBOTkIDI5Ppd9vbRDKlKjisfW0eW2Rh_RIgoblzTyFzGgpuGgrxZPLYFfAuZJcmgA/exec', {
+      method: 'POST',
+      //headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'saveProject',
+        project
+      })
+    });
+
+    const text = await res.text();
+    console.log('GAS response:', text);
+
+  } catch (err) {
+    alert('Nem érhető el a Google mentés');
+    console.error(err);
+  }
 
   // HIBALISTA TÖRLÉSE
   project = {
