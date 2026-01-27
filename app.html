@@ -251,7 +251,7 @@
     </button>
 
     <label>Tárhelyazonosító
-      <input id="hibaTA" placeholder="pl. A-0101">
+      <input id="hibaTA" placeholder="pl. A-0101" onclick="this.value=''">
     </label>
 
     <label>Sor
@@ -636,7 +636,7 @@ const alkatreszSelect = document.getElementById('hibaAlkatresz');
     rendbenBtn.style.display = 'none';
     //visszaállítás alapértékre
     fileInput.value = ''; // reset fotó
-    hibaTA.value = '';
+    //hibaTA.value = '';
     //hibaSor.value = '';
     hibaSzint.value='0';
     //hibaGyarto.value='';
