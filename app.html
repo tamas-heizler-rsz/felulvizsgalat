@@ -419,6 +419,7 @@ document.getElementById('scanBtn').onclick = () => {
     { fps: 10, qrbox: 250 },
     qrText => {
       document.getElementById('hibaTA').value = qrText;
+      hibaMezoOssz.style.display='none';
       qrReader.stop();
       document.getElementById('qr-reader').style.display = 'none';
     },
