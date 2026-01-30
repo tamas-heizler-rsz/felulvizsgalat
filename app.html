@@ -254,11 +254,23 @@
       <input id="hibaTA" placeholder="pl. A-0101" onclick="this.value=''">
     </label>
 
+    <input type="text" id="qrInput" placeholder="QR kód értéke">
+    <button id="scanBtn">📷 QR beolvasás</button>
+    <div id="qr-reader" style="width:100%; max-width:300px; margin:auto; display:none;"></div>
+
     <label>Sor
     <div class="number-control">
     <button type="button" class="step-btn" data-target="hibaSor" data-step="-1" tabindex="-1">−</button>
     <input id="hibaSor" placeholder="pl. 1. sor" step="1" tabindex="-1">
     <button type="button" class="step-btn" data-target="hibaSor" data-step="1">+</button>
+    </div>
+    </label>
+
+    <label id="hibaMezoOssz" style="display:block;">Mező
+    <div class="number-control">
+    <button type="button" class="step-btn" data-target="hibaMezo" data-step="-1" tabindex="-1">−</button>
+    <input id="hibaMezo" placeholder="pl. 1. mező" step="1" tabindex="-1">
+    <button type="button" class="step-btn" data-target="hibaMezo" data-step="1">+</button>
     </div>
     </label>
 
@@ -396,7 +408,31 @@
 
 </section>
 
+<script src="https://unpkg.com/html5-qrcode"></script>
 <script>
+//QR kód
+const qrReader = new Html5Qrcode("qr-reader");
+
+document.getElementById('scanBtn').onclick = () => {
+  document.getElementById('qr-reader').style.display = 'block';
+
+  qrReader.start(
+    { facingMode: { exact: "environment" } },
+    { fps: 10, qrbox: 250 },
+    qrText => {
+      document.getElementById('qrInput').value = qrText;
+      qrReader.stop();
+      document.getElementById('qr-reader').style.display = 'none';
+    },
+    error => {
+      console.log('QR error:', error);
+    }
+  ).catch(err => {
+    alert('Kamera nem indítható: ' + err);
+    console.error(err);
+  });
+};
+//QR kód vége
   let project = {
     meta: {},
     hibak: []
@@ -421,6 +457,19 @@ const megj = document.getElementById('hibaMegj');
 megj.addEventListener('input', () => autoResize(megj));
 
 //feltételes megjelenítés
+const vanTarhelyazonosito = document.getElementById('hibaTA');
+vanTarhelyazonosito.addEventListener('change', () => {
+  if(vanTarhelyazonosito==""){
+    hibaMezoOssz.style.display='block';
+  }
+  if(vanTarhelyazonosito!=""){
+    hibaMezoOssz.style.display='none';
+  }
+});
+vanTarhelyazonosito.addEventListener('click', () => {
+  hibaMezoOssz.style.display='block';
+});
+
 const alkatreszSelect = document.getElementById('hibaAlkatresz');
     const ehLabel = document.getElementById('EHLabel');
     const jcsLabel = document.getElementById('JCSLabel');
@@ -615,11 +664,15 @@ const alkatreszSelect = document.getElementById('hibaAlkatresz');
     const file = fileInput.files[0];
     fotoData = await fileToBase64Resized(file);
   }
+  if (hibaTA.value==""){
+    hibaTA.value=hibaSor.value+"-"+hibaMezo.value+"-"+hibaSzint.value;
+  }  
     project.hibak.push({
       terulet: hibaTerulet.value,
       rendben: false,
       tarhelyazonosito: hibaTA.value,
       sor: hibaSor.value,
+      mezo: hibaMezo.value,
       szint: hibaSzint.value,
       gyarto: hibaGyarto.value,
       alkatresz: hibaAlkatresz.value,
@@ -786,6 +839,7 @@ const alkatreszSelect = document.getElementById('hibaAlkatresz');
 
     const text = await res.text();
     console.log('GAS response:', text);
+
 
   } catch (err) {
     alert('Nem érhető el a Google mentés');
