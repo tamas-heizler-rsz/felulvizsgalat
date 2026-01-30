@@ -252,11 +252,9 @@
 
     <label>Tárhelyazonosító
       <input id="hibaTA" placeholder="pl. A-0101" onclick="this.value=''">
+      <button id="scanBtn">QR beolvasás</button>
+      <div id="qr-reader" style="width:100%; max-width:300px; margin:auto; display:none;"></div>
     </label>
-
-    <input type="text" id="qrInput" placeholder="QR kód értéke">
-    <button id="scanBtn">📷 QR beolvasás</button>
-    <div id="qr-reader" style="width:100%; max-width:300px; margin:auto; display:none;"></div>
 
     <label>Sor
     <div class="number-control">
@@ -420,7 +418,7 @@ document.getElementById('scanBtn').onclick = () => {
     { facingMode: { exact: "environment" } },
     { fps: 10, qrbox: 250 },
     qrText => {
-      document.getElementById('qrInput').value = qrText;
+      document.getElementById('hibaTA').value = qrText;
       qrReader.stop();
       document.getElementById('qr-reader').style.display = 'none';
     },
