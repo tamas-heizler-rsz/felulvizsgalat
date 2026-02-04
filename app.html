@@ -663,13 +663,14 @@ const alkatreszSelect = document.getElementById('hibaAlkatresz');
     const file = fileInput.files[0];
     fotoData = await fileToBase64Resized(file);
   }
-  if (hibaTA.value==""){
-    hibaTA.value=hibaSor.value+"-"+hibaMezo.value+"-"+hibaSzint.value;
+  let tha=hibaTA.value;
+  if (tha==""){
+    tha=hibaSor.value+"-"+hibaMezo.value+"-"+hibaSzint.value;
   }  
     project.hibak.push({
       terulet: hibaTerulet.value,
       rendben: false,
-      tarhelyazonosito: hibaTA.value,
+      tarhelyazonosito: tha,
       sor: hibaSor.value,
       mezo: hibaMezo.value,
       szint: hibaSzint.value,
@@ -704,10 +705,10 @@ const alkatreszSelect = document.getElementById('hibaAlkatresz');
     meretLabel.style.display = 'none';
     jcsLabel.style.display = 'none';
     ehLabel.style.display = 'none';
-    qrReader.stop();
-    document.getElementById('qr-reader').style.display = 'none';
     save();
     renderIssues();
+    qrReader.stop();
+    document.getElementById('qr-reader').style.display = 'none';
   };
 
   function fileToBase64Resized(file, maxWidth = 1280, quality = 0.75) {
