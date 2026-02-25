@@ -293,6 +293,7 @@
         <option>Tartógerenda</option>
         <option>Túltolásgátló</option>
         <option>Biztosítószeg</option>
+        <option>Terhelésjelző tábla</option>
         <option>Egyéb</option>
       </select>
     </label>
@@ -323,6 +324,14 @@
     </div>
     </label>
 
+    <label>Mennyiség
+    <div class="number-control">
+    <button type="button" class="step-btn" data-target="hibaMennyiseg" data-step="-1" tabindex="-1">−</button>
+    <input id="hibaMennyiseg" placeholder="pl. 1 db" type="number" step="1" tabindex="-1" min="1" inputmode="numeric">
+    <button type="button" class="step-btn" data-target="hibaMennyiseg" data-step="1">+</button>
+    </div>
+    </label>
+
     <label>Sérülési osztály
       <select id="hibaSO">
         <option>Zöld</option>
@@ -331,10 +340,18 @@
       </select>
     </label>
 
-    <label>Megjegyzés
+    <label>Megjegyzés (jegyzőkönyvbe)
       <textarea
         id="hibaMegj"
         placeholder="Megjegyzés"
+        rows="2"
+      ></textarea>
+    </label>
+
+    <label>Megjegyzés (saját)
+      <textarea
+        id="hibaMegjSajat"
+        placeholder="Megjegyzés magunknak"
         rows="2"
       ></textarea>
     </label>
@@ -454,6 +471,9 @@ teruletInput.addEventListener('input', () => {
 };
 const megj = document.getElementById('hibaMegj');
 megj.addEventListener('input', () => autoResize(megj));
+
+const megjSajat = document.getElementById('hibaMegjSajat');
+megjSajat.addEventListener('input', () => autoResize(megjSajat));
 
 //feltételes megjelenítés
 const vanTarhelyazonosito = document.getElementById('hibaTA');
@@ -682,8 +702,10 @@ const alkatreszSelect = document.getElementById('hibaAlkatresz');
       meretHossz: hibaMeretHossz.value,
       meretSzel: hibaMeretSzel.value,
       meretVast: hibaMeretVast.value,
+      mennyiseg: hibaMennyiseg.value,
       serulesiO: hibaSO.value,
       megjegyzes: hibaMegj.value,
+      megjegyzesSajat: hibaMegjSajat.value,
       foto: fotoData
     });
     rendbenBtn.style.display = 'none';
@@ -705,6 +727,7 @@ const alkatreszSelect = document.getElementById('hibaAlkatresz');
     meretLabel.style.display = 'none';
     jcsLabel.style.display = 'none';
     ehLabel.style.display = 'none';
+    hibaMennyiseg.value=1;
     save();
     renderIssues();
     qrReader.stop();
@@ -783,8 +806,10 @@ const alkatreszSelect = document.getElementById('hibaAlkatresz');
           első/hátsó: ${h.elsohatso}<br>
           javítás/csere: ${h.javitascsere}<br>
           méret: ${h.meretHossz}x${h.meretMag}x${h.meretSzel}x${h.meretVast}<br>
+          mennyiseg: ${h.hibaMennyiseg}<br>
           sérülési osztály: ${h.serulesiO}<br>
-          megjegyzés: ${h.megjegyzes}
+          megjegyzés: ${h.megjegyzes}<br>
+          megjegyzés (saját): ${h.megjegyzesSajat}
         </div>`;
       }
       else {
