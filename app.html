@@ -341,7 +341,20 @@
       </select>
     </label>
 
-    <label>Megjegyzés (jegyzőkönyvbe)
+    <label>Sablon megjegyzés beszúrása
+      <select id=sablonMegj onchange="document.getElementById('hibaMegj').value += this.value">
+        <option value="">Sablon megjegyzés beszúrása</option>
+        <option value="Sérült, cseréje szükséges!">Sérült, cseréje szükséges!</option>
+        <option value="Hiányzik, pótlása szükséges!">Hiányzik, pótlása szükséges!</option>
+        <option value="Sérült, javítása szükséges!">Sérült, javítása szükséges!</option>
+        <option value="Javítása szükséges, visszaforgatással!">Javítása szükséges, visszaforgatással!</option>
+        <option value="Terhelésjelző tábla hiányzik, pótlása szükséges!">Terhelésjelző tábla hiányzik, pótlása szükséges!</option>
+        <option value="Lehullás veszély! Megszüntetése szükséges!">Lehullás veszély! Megszüntetése szükséges!</option>
+        <option value="Áthullás veszély! Megszüntetése szükséges!">Áthullás veszély! Megszüntetése szükséges!</option>
+      </select>
+    </label>
+
+    <label>Megjegyzés teljes szövege (jegyzőkönyvbe)
       <textarea
         id="hibaMegj"
         placeholder="Megjegyzés"
@@ -731,6 +744,7 @@ const alkatreszSelect = document.getElementById('hibaAlkatresz');
     hibaJCS.value='Csere';
     hibaSO.value='Sárga';
     hibaMegj.value='';
+    hibaMegjSajat.value='';
     hibaMeretHossz.value='';
     hibaMeretMag.value='';
     hibaMeretSzel.value='';
@@ -802,11 +816,15 @@ const alkatreszSelect = document.getElementById('hibaAlkatresz');
   document.getElementById('vizsgaloCeg').addEventListener('change', () => {
     document.getElementById('toIssues').focus();
   });
+    document.getElementById('sablonMegj').addEventListener('change', () => {
+    document.getElementById('hibaMegj').focus();
+  });
 
   function renderIssues() {
     issueList.innerHTML = '';
     project.hibak.forEach((h, i) => {
       if (!h.rendben){
+
       issueList.innerHTML += `
         <div class="issue ${severityClass(h.serulesiO)}">
           <b>${i + 1}. feljegyzés</b> ${h.tarhelyazonosito}<br>
@@ -851,7 +869,7 @@ const alkatreszSelect = document.getElementById('hibaAlkatresz');
   // fájl export (később itt lesz PDF)
   const blob = new Blob(
     [JSON.stringify(project, null, 2)],
-    { type: 'application/json' }
+    { type: 'application/json' } 
   );
 
   const a = document.createElement('a');
