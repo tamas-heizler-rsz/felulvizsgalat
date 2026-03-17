@@ -765,6 +765,7 @@ const alkatreszSelect = document.getElementById('hibaAlkatresz');
     hibaSO.value='Sárga';
     hibaMegj.value='';
     hibaMegjSajat.value='';
+    sablonMegj.value='Sablon megjegyzés beszúrása';
     hibaMeretHossz.value='';
     hibaMeretMag.value='';
     hibaMeretSzel.value='';
@@ -907,10 +908,14 @@ const alkatreszSelect = document.getElementById('hibaAlkatresz');
     const res = await fetch('https://script.google.com/macros/s/AKfycbyj9dBOTkIDI5Ppd9vbRDKlKjisfW0eW2Rh_RIgoblzTyFzGgpuGgrxZPLYFfAuZJcmgA/exec', {
       method: 'POST',
       //headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'text/plain;charset=utf-8'
+      },
       body: JSON.stringify({
         action: 'saveProject',
         project
-      })
+      }),
+      redirect: 'follow'
     });
 
     const text = await res.text();
